@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Justo Store Server",
+  "main": "index.js",
+  "scripts": {
+    "start-dev": "nodemon --watch database --watch api index.js --exec \"babel-node index\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "test",
+    "javascript"
+  ],
+  "author": "Abraham López",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.4.4",
+    "clone-deep": "^4.0.1",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "nodemon": "^1.19.0"
+  }
+}
