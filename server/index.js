@@ -8,3 +8,5 @@ const database = connectDatabase(DATABASE_DRIVER);
 const app = justoStore(database);
 
 console.log(`Server listening on ${PORT}`);
+
+export default app;
