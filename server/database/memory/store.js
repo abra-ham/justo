@@ -16,8 +16,8 @@ class MemoryStore {
 
   update(item) {
     return new Promise((resolve, reject) => {
-      if (!this.items[itemId]) {
-        reject(new ItemNotFound('Item', itemId));
+      if (!this.items[item.id]) {
+        reject('Error');
       } else {
         resolve(this.items[item.id] = item);
       }
@@ -33,7 +33,7 @@ class MemoryStore {
   findById(itemId) {
     return new Promise((resolve, reject) => {
       if (!this.items[itemId]) {
-        reject(new ItemNotFound('Item', itemId));
+        reject('Error');
       } else {
         resolve(cloneDeep(this.items[itemId]));
       }

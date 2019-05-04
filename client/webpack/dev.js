@@ -9,6 +9,6 @@ module.exports = merge(common, {
     contentBase: path.resolve(__dirname, '../dist'),
     port: 9001,
     historyApiFallback: true,
-    openPage: '',
+    openPage: 'store',
   },
 });

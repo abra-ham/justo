@@ -1,0 +1,38 @@
+.checkout {
+	height: 100%;
+	position: relative;
+
+	.items {
+		width: 100%;
+
+		> ul {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+
+			li {
+				padding: 1rem;
+				height: auto;
+				border-bottom: 1px solid $black;
+
+				.promotion {
+					font-size: 0.7rem;
+					font-style: italic;
+				}
+			}
+		}
+	}
+
+	.totals {
+		padding: 1rem;
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		text-align: right;
+		border-top: 1px solid $black;
+
+		> div {
+			margin-bottom: 0.5rem;
+		}
+	}
+}
