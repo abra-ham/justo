@@ -1,0 +1,24 @@
+:global(html) {
+	height: 100%;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+:global(body) {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	color: $black;
+	font-family: 'Roboto Mono';
+	overflow: hidden;
+}
+
+:global(#app) {
+	height: 100%;
+	width: 100%;
+}
+
+:global(*) {
+	box-sizing: border-box;
+}
