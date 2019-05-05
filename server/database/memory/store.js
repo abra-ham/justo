@@ -53,4 +53,4 @@ class MemoryStore {
   }
 }
 
-module.exports = MemoryStore;
+export default MemoryStore;

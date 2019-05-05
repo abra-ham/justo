@@ -99,4 +99,4 @@ class MemoryDatabase {
   }
 }
 
-module.exports = MemoryDatabase;
+export default MemoryDatabase;
