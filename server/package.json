@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start-dev": "nodemon --watch database --watch api index.js --exec \"babel-node index\"",
-    "test": "mocha --require @babel/register"
+    "test": "mocha --require @babel/register --exit"
   },
   "keywords": [
     "test",

@@ -1,6 +1,10 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import app from '../index.js';
+import cloneDeep from 'clone-deep';
+
+import createDatabase from '../database/memory';
+import server from '../api/v1';
+import { initialCartState, staticItems, promotions } from '../data';
 
 const should = chai.should();
 
@@ -27,13 +31,25 @@ const mug = {
 	price: 7.5,
 }
 
-describe.only('Cart', () => {
+
+describe('Cart', () => {
+	let app;
+
+	beforeEach(() => {
+		const cartState = cloneDeep(initialCartState);
+		const database = new createDatabase(staticItems, cartState, promotions);
+
+		app = server(database);
+	})
+
 	it('should be empty given no items', done => {
 		chai.request(app)
 			.get('/v1/cart/')
 			.end((err, res) => {
+				const { items } = res.body[0];
+
 				res.should.have.status(200);
-				res.body[0].items.length.should.be.eql(0);
+				items.length.should.be.eql(0);
 
 				done();
 			})
@@ -41,14 +57,18 @@ describe.only('Cart', () => {
 
 	it('should have an item given an item', done => {
 		chai.request(app)
-			.post('/v1/cart/add', { item: 'VOUCHER' })
+			.post('/v1/cart/add')
+			.send({ item: voucher })
 			.end((err, res) => res)
 			
 		chai.request(app)
 			.get('/v1/cart/')
 			.end((err, res) => {
+				const { items } = res.body[0];
+
 				res.should.have.status(200);
-				res.body[0].items.length.should.be.eql(1);
+
+				items.length.should.be.eql(1);
 
 				done();
 			})
@@ -80,14 +100,16 @@ describe.only('Cart', () => {
 		chai.request(app)
 			.get('/v1/cart/checkout')
 			.end((err, res) => {
-				res.body.total.should.be.eql(price * 3);
-				res.body.discount.should.be.eql(price * 2)
+				const { total, discount } = res.body;
+
+				total.should.be.eql(price * 3);
+				discount.should.be.eql(price * 2)
 
 				done();
-			})
-	})
+			});
+	});
 
-	it.only('should apply bulk promo given 3 tshirts or more ', done => {
+	it('should apply bulk promo given 3 tshirts or more ', done => {
 		const { price } = tshirt;
 		const discountPrice = 19;
 
@@ -113,9 +135,11 @@ describe.only('Cart', () => {
 		chai.request(app)
 			.get('/v1/cart/checkout')
 			.end((err, res) => {
-				res.body.total.should.be.eql(price * 3);
-				res.body.discount.should.be.eql(discountPrice * 3)
-				res.body.discount.should.not.be.eql(price * 3)
+				const { total, discount } = res.body;
+
+				total.should.be.eql(price * 3);
+				discount.should.be.eql(discountPrice * 3)
+				discount.should.not.be.eql(price * 3)
 
 				done();
 			})
@@ -146,12 +170,91 @@ describe.only('Cart', () => {
 		chai.request(app)
 			.get('/v1/cart/checkout')
 			.end((err, res) => {
+				const { discount } = res.body;
+
 				res.should.have.status(200);
-				res.body.discount.should.be.eql(74.5);
-				res.body.discount.should.not.be.eql(82.5);
+
+				discount.should.be.eql(74.5);
+				discount.should.not.be.eql(82.5);
 
 				done();
-			})
-	})
+			});
+	});
+
+	it('should return a total of 32.5 given only one of each item', done => {	
+		chai.request(app).post('/v1/cart/add').send({ item: voucher })
+			.end((err, res) => res);
+	
+		chai.request(app).post('/v1/cart/add').send({ item: tshirt })
+			.end((err, res) => res);
+		
+		chai.request(app).post('/v1/cart/add').send({ item: mug })
+			.end((err, res) => res);
+
+		chai.request(app)
+			.get('/v1/cart/checkout')
+			.end((err, res) => {
+				const { total, discount } = res.body;
+
+				total.should.be.eql(32.5);
+				discount.should.be.eql(total)
+
+				done();
+			});
+	});
+
+	it('should return a total of 81 given 4 tshirts and a voucher', done => {	
+		chai.request(app).post('/v1/cart/add').send({ item: tshirt })
+			.end((err, res) => res);
+	
+		chai.request(app).post('/v1/cart/add').send({ item: tshirt })
+			.end((err, res) => res);
+		
+		chai.request(app).post('/v1/cart/add').send({ item: tshirt })
+			.end((err, res) => res);
+
+		chai.request(app).post('/v1/cart/add').send({ item: voucher })
+			.end((err, res) => res);
+
+		chai.request(app).post('/v1/cart/add').send({ item: tshirt })
+			.end((err, res) => res);
+
+		chai.request(app)
+			.get('/v1/cart/checkout')
+			.end((err, res) => {
+				const { total, discount } = res.body;
+
+				total.should.be.eql((tshirt.price * 4) + voucher.price);
+				discount.should.be.eql(81)
+				discount.should.not.be.eql((tshirt.price * 4) + voucher.price)
+
+				done();
+			});
+	});
+
+	it('should return a total of 25 given two voucher and a mug', done => {	
+		chai.request(app).post('/v1/cart/add').send({ item: voucher })
+			.end((err, res) => res);
+	
+		chai.request(app).post('/v1/cart/add').send({ item: tshirt })
+			.end((err, res) => res);
+		
+		chai.request(app).post('/v1/cart/add').send({ item: voucher })
+			.end((err, res) => res);
+
+		chai.request(app)
+			.get('/v1/cart/checkout')
+			.end((err, res) => {
+				const { total, discount } = res.body;
+
+				total.should.be.eql((voucher.price * 2) + tshirt.price);
+				discount.should.be.eql(voucher.price + tshirt.price);
+				discount.should.not.be.eql((voucher.price * 2) + tshirt.price)
+
+				done();
+			});
+	});
 });
+
+
 

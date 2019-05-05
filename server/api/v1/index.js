@@ -18,7 +18,7 @@ export default (database, port = 9000) => {
 	app.use(databaseMiddleware(database));
 
 	app.use('/v1/cart', cartRouter);
-	app.use('/v1/items', itemsRouter);
+  app.use('/v1/items', itemsRouter);
 
   return app.listen(port);
 }
